@@ -5,26 +5,31 @@ public class MinionsSpawn : MonoBehaviour
     public GameObject MinionPrefab = null;
     public string MinionTag = null;
 
-    private float _spawn_interval = 5;
-    private float timer = 0;
+    private float _spawn_interval = 5f;
+    private float _spawn_timer = 0f;
 
     // Update is called once per frame
     private void Update()
     {
-        timer += Time.deltaTime;
+        _spawn_timer += Time.deltaTime;
 
-        if (timer > _spawn_interval)
+        // Spawn minions
+        if (_spawn_timer > _spawn_interval)
         {
             SpawnMinion();
 
-            timer -= _spawn_interval;
+            _spawn_timer -= _spawn_interval;
         }
     }
 
     // Spawn a minion
     private void SpawnMinion()
     {
-        GameObject minion = Instantiate(MinionPrefab, this.gameObject.transform.position, Quaternion.identity);
-        minion.tag = MinionTag;
+        // Create and set up a minion
+        GameObject minion_prefab = MinionPrefab;
+        minion_prefab.tag = MinionTag;
+
+        // Create the game object
+        Instantiate(minion_prefab, this.gameObject.transform.position, Quaternion.identity);
     }
 }
