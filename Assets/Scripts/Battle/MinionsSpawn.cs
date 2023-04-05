@@ -5,7 +5,8 @@ public class MinionsSpawn : MonoBehaviour
     public GameObject MinionPrefab = null;
     public string MinionTag = null;
 
-    private float _spawn_interval = 5f;
+    // Spawn properties
+    private float _spawn_interval = 10f;
     private float _spawn_timer = 0f;
 
     // Update is called once per frame

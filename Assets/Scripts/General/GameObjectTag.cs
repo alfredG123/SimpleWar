@@ -1,5 +1,6 @@
 public static class GameObjectTag
 {
-    public static string Ally = "Ally";
-    public static string Enemy = "Enemy";
+    // Minions
+    public const string Ally = "Ally";
+    public const string Enemy = "Enemy";
 }

@@ -3,14 +3,25 @@ using UnityEngine;
 
 public class Minion : MonoBehaviour
 {
+    public GameObject FireLocation = null;
+
     // Minion list
     private static List<GameObject> _enemy_list = new List<GameObject>();
     private static List<GameObject> _ally_list = new List<GameObject>();
 
     // Minion properties
+    private float _health = 10f;
     private float _speed = 5f;
-    private float _attack_range = 1.5f;
+    private float _attack_speed = 2f;
+    private float _attack_range = 5f;
+    private bool _is_destory = false;
 
+    // Timer
+    private float _attack_timer = 0f;
+
+    /// <summary>
+    /// Set up the minion
+    /// </summary>
     private void Awake()
     {
         // Store the minion
@@ -24,7 +35,9 @@ public class Minion : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Update is called once per frame
+    /// </summary>
     private void FixedUpdate()
     {
         // Select an enemy to attack
@@ -39,11 +52,55 @@ public class Minion : MonoBehaviour
         // If there is a target, attack it
         else
         {
-            
+            _attack_timer += Time.deltaTime;
+
+            if (_attack_timer > _attack_speed)
+            {
+                ProjectileObject.FireProjectile(FireLocation.transform.position, enemy);
+
+                _attack_timer -= _attack_speed;
+            }
         }
     }
 
-    // Move the current minion
+    /// <summary>
+    /// Deduct the health point
+    /// </summary>
+    /// <param name="damage_amount"></param>
+    public void TakeDamage(float damage_amount)
+    {
+        _health -= damage_amount;
+
+        if (_health <= 0f)
+        {
+            // Remove the current object
+            if (this.tag == GameObjectTag.Ally)
+            {
+                _ally_list.Remove(this.gameObject);
+            }
+            else
+            {
+                _enemy_list.Remove(this.gameObject);
+            }
+
+            _is_destory = true;
+
+           Destroy(this.gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Return if the game object is destory
+    /// </summary>
+    /// <returns></returns>
+    public bool IsDestory()
+    {
+        return _is_destory;
+    }
+
+    /// <summary>
+    /// Move the current minion
+    /// </summary>
     private void Move()
     {
         Vector3 direction;
@@ -62,7 +119,10 @@ public class Minion : MonoBehaviour
         transform.Translate(direction.normalized * _speed * Time.deltaTime, Space.World);
     }
 
-    // Select the nearest game object that is an enemy
+    /// <summary>
+    /// Select the nearest game object that is an enemy
+    /// </summary>
+    /// <returns></returns>
     private GameObject GetNearestEnemy()
     {
         List<GameObject> enemy_list;
@@ -83,7 +143,12 @@ public class Minion : MonoBehaviour
         return nearest_enemy;
     }
 
-    // Find the nearest enemy
+    /// <summary>
+    /// Find the nearest enemy
+    /// </summary>
+    /// <param name="object_list"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
     private GameObject GetNearestObject(List<GameObject> object_list, float range)
     {
         GameObject nearest_object = null;
