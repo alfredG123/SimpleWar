@@ -4,7 +4,7 @@ public class ProjectileObject : MonoBehaviour
 {
     // Properties
     private GameObject _target = null;
-    private float _speed = 1f;
+    private float _speed = 5f;
 
     /// <summary>
     /// Move the projectile to the target position
@@ -15,15 +15,15 @@ public class ProjectileObject : MonoBehaviour
 
         transform.position += direction * _speed * Time.deltaTime;
 
-        transform.eulerAngles = new Vector3(0, 0, ConvertDirectionToAngle(direction));
+        transform.eulerAngles = new Vector3(0, 0, GeneralMethods.ConvertDirectionToAngle(direction));
 
-        if (_target.GetComponent<Minion>().IsDestory())
+        if (!BattleManager.CheckIfMinionExists(_target.GetComponent<Minion>()))
         {
             Destroy(this.gameObject);
         }
         else
         {
-            if (Vector3.Distance(_target.transform.position, this.transform.position) <= 1f)
+            if (Vector3.Distance(_target.transform.position, this.transform.position) <= 0.3f)
             {
                 _target.GetComponent<Minion>().TakeDamage(5);
 
@@ -41,23 +41,6 @@ public class ProjectileObject : MonoBehaviour
         _target = target;
     }
 
-    /// <summary>
-    /// Calculate the angle for the projectile
-    /// </summary>
-    /// <param name="direction"></param>
-    /// <returns></returns>
-    private float ConvertDirectionToAngle(Vector3 direction)
-    {
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-
-        if (angle < 0)
-        {
-            angle += 360;
-        }
-
-        return angle;
-    }
-
     #region Static
     /// <summary>
     /// Create a projectile object, and move it to the target
@@ -66,7 +49,7 @@ public class ProjectileObject : MonoBehaviour
     /// <param name="target"></param>
     public static void FireProjectile(Vector3 spawn_position, GameObject target)
     {
-        GameObject projectile = Instantiate(GameObjectCreator.Creator.ProjectileObject, spawn_position, Quaternion.identity);
+        GameObject projectile = Instantiate(GameObjectCreator.Creator.Projectile, spawn_position, Quaternion.identity);
 
         ProjectileObject project_object = projectile.GetComponent<ProjectileObject>();
         project_object.SelectTargetAndFire(target);

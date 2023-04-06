@@ -2,21 +2,20 @@ using UnityEngine;
 
 public class GameObjectCreator : MonoBehaviour
 {
-    // Prebfab
-    public GameObject ProjectileObject = null;
+    public GameObject Projectile = null;
+    public GameObject Minion = null;
 
     #region Static
     // Creator
     private static GameObjectCreator _creator = null;
 
     /// <summary>
-    /// Return the creator for the prefab
+    /// Return a creator for prefabs
     /// </summary>
     public static GameObjectCreator Creator
     {
         get
         {
-            // Create the creator
             if (_creator == null)
             {
                 _creator = (Instantiate(Resources.Load("GameObjectCreator")) as GameObject).GetComponent<GameObjectCreator>();

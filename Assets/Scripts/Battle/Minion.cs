@@ -1,39 +1,77 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class Minion : MonoBehaviour
 {
-    public GameObject FireLocation = null;
-
-    // Minion list
-    private static List<GameObject> _enemy_list = new List<GameObject>();
-    private static List<GameObject> _ally_list = new List<GameObject>();
+    public enum MinionCamp
+    {
+        Player,
+        Bot,
+    }
 
     // Minion properties
+    private string _unique_id = string.Empty;
+    private MinionCamp _minion_camp = MinionCamp.Player;
+    private GameObject _fire_location = null;
+
+    // Minion stats
     private float _health = 10f;
     private float _speed = 5f;
     private float _attack_speed = 2f;
     private float _attack_range = 5f;
-    private bool _is_destory = false;
 
     // Timer
     private float _attack_timer = 0f;
 
+    #region Properties
     /// <summary>
-    /// Set up the minion
+    /// Return the identifier of the minion
     /// </summary>
-    private void Awake()
+    public string UniqueID
     {
-        // Store the minion
-        if (this.tag == GameObjectTag.Ally)
+        get
         {
-            _ally_list.Add(this.gameObject);
-        }
-        else
-        {
-            _enemy_list.Add(this.gameObject);
+            return _unique_id;
         }
     }
+
+    /// <summary>
+    /// Return the camp of the minion
+    /// </summary>
+    public MinionCamp Camp
+    {
+        get
+        {
+            return _minion_camp;
+        }
+    }
+
+    /// <summary>
+    /// Return the attack range of the minion
+    /// </summary>
+    public float AttackRange
+    {
+        get
+        {
+            return _attack_range;
+        }
+    }
+    #endregion
+
+    #region Static
+    /// <summary>
+    /// Create a minion object
+    /// </summary>
+    /// <param name="spawn_position"></param>
+    /// <param name="minion_camp"></param>
+    public static void SpawnMinion(Vector3 spawn_position, MinionCamp minion_camp)
+    {
+        GameObject minion_object = Instantiate(GameObjectCreator.Creator.Minion, spawn_position, Quaternion.identity);
+
+        Minion Minion = minion_object.GetComponent<Minion>();
+        Minion.SetupMinion(minion_camp);
+    }
+    #endregion
 
     /// <summary>
     /// Update is called once per frame
@@ -41,7 +79,7 @@ public class Minion : MonoBehaviour
     private void FixedUpdate()
     {
         // Select an enemy to attack
-        GameObject enemy = GetNearestEnemy();
+        GameObject enemy = BattleManager.GetNearestEnemy(this);
 
         // If there are no targets, move forward
         if (enemy == null)
@@ -52,50 +90,32 @@ public class Minion : MonoBehaviour
         // If there is a target, attack it
         else
         {
-            _attack_timer += Time.deltaTime;
-
-            if (_attack_timer > _attack_speed)
+            if (_attack_timer <= 0)
             {
-                ProjectileObject.FireProjectile(FireLocation.transform.position, enemy);
+                ProjectileObject.FireProjectile(_fire_location.transform.position, enemy);
 
-                _attack_timer -= _attack_speed;
+                _attack_timer = _attack_speed;
             }
+
+            _attack_timer -= Time.deltaTime;
         }
     }
 
     /// <summary>
-    /// Deduct the health point
+    /// Deduct the health point from the enemy
     /// </summary>
     /// <param name="damage_amount"></param>
     public void TakeDamage(float damage_amount)
     {
         _health -= damage_amount;
 
+        // If the minion has no health, destory it
         if (_health <= 0f)
         {
-            // Remove the current object
-            if (this.tag == GameObjectTag.Ally)
-            {
-                _ally_list.Remove(this.gameObject);
-            }
-            else
-            {
-                _enemy_list.Remove(this.gameObject);
-            }
-
-            _is_destory = true;
+           BattleManager.DeregisterMinion(this);
 
            Destroy(this.gameObject);
         }
-    }
-
-    /// <summary>
-    /// Return if the game object is destory
-    /// </summary>
-    /// <returns></returns>
-    public bool IsDestory()
-    {
-        return _is_destory;
     }
 
     /// <summary>
@@ -106,13 +126,13 @@ public class Minion : MonoBehaviour
         Vector3 direction;
 
         // Determine the direction
-        if (this.tag == GameObjectTag.Ally)
+        if (_minion_camp == MinionCamp.Bot)
         {
-            direction = Vector3.left;
+            direction = Vector3.right;
         }
         else
         {
-            direction = Vector3.right;
+            direction = Vector3.left;
         }
 
         // Move the minion toward to target direction
@@ -120,61 +140,15 @@ public class Minion : MonoBehaviour
     }
 
     /// <summary>
-    /// Select the nearest game object that is an enemy
+    /// Set up the minion properties
     /// </summary>
-    /// <returns></returns>
-    private GameObject GetNearestEnemy()
+    /// <param name="minion_camp"></param>
+    private void SetupMinion(MinionCamp minion_camp)
     {
-        List<GameObject> enemy_list;
-        GameObject nearest_enemy;
- 
-        // Get the enemy list
-        if (this.tag == GameObjectTag.Ally)
-        {
-            enemy_list = _enemy_list;
-        }
-        else
-        {
-            enemy_list = _ally_list;
-        }
+        _unique_id = Guid.NewGuid().ToString();
+        _fire_location = this.gameObject.transform.Find("FireLocation").gameObject;
+        _minion_camp = minion_camp;
 
-        nearest_enemy = GetNearestObject(enemy_list, _attack_range);
-
-        return nearest_enemy;
-    }
-
-    /// <summary>
-    /// Find the nearest enemy
-    /// </summary>
-    /// <param name="object_list"></param>
-    /// <param name="range"></param>
-    /// <returns></returns>
-    private GameObject GetNearestObject(List<GameObject> object_list, float range)
-    {
-        GameObject nearest_object = null;
-        float nearest_distance = 0f;
-
-        foreach (GameObject game_object in object_list)
-        {
-            float distance = Vector3.Distance(this.gameObject.transform.position, game_object.transform.position);
-
-            if (distance <= range)
-            {
-                if (nearest_object == null)
-                {
-                    nearest_object = game_object;
-                }
-                else
-                {
-                    if (distance < nearest_distance)
-                    {
-                        nearest_object = game_object;
-                        nearest_distance = distance;
-                    }
-                }
-            }
-        }
-
-        return nearest_object;
+        BattleManager.RegisterMinion(this);
     }
 }

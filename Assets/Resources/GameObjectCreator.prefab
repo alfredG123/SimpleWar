@@ -44,4 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 519b39434801e1e468d93b605bf32f0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ProjectileObject: {fileID: 7581490725057978829, guid: 38f1d8e9803d7054496d9be4b4e91f9b, type: 3}
+  Projectile: {fileID: 7581490725057978829, guid: 38f1d8e9803d7054496d9be4b4e91f9b, type: 3}
+  Minion: {fileID: 3922462256010688066, guid: 974299020ba2c024fa6e92130f7cc755, type: 3}
