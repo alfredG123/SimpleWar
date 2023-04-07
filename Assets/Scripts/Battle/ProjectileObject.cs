@@ -17,7 +17,7 @@ public class ProjectileObject : MonoBehaviour
 
         transform.eulerAngles = new Vector3(0, 0, GeneralMethods.ConvertDirectionToAngle(direction));
 
-        if (!BattleManager.CheckIfMinionExists(_target_object))
+        if (!BattleManager.CheckIfObjectExists(_target_object))
         {
             Destroy(this.gameObject);
         }

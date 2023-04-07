@@ -1,8 +1,68 @@
+using System;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
-public static class BattleManager
+public class BattleManager : MonoBehaviour
 {
+    private enum BattleCondition
+    {
+        InProgress,
+        Win,
+        Lose,
+    }
+
+    public Castle BotCastle = null;
+    public Castle PlayerCastle = null;
+
+    public Button SpawnButton = null;
+    public TMP_Text EndBattleText =null;
+    public Button ConfirmButton =null;
+
+    private void Update()
+    {
+        BattleCondition battle_condition = BattleCondition.InProgress;
+
+        // Check if the castle is destory
+        if (!CheckIfObjectExists(BotCastle))
+        {
+            battle_condition = BattleCondition.Win;
+        }
+        else if (!CheckIfObjectExists(PlayerCastle))
+        {
+            battle_condition = BattleCondition.Lose;
+        }
+
+        if (battle_condition != BattleCondition.InProgress)
+        {
+            ShowEndScreen(battle_condition);
+        }
+    }
+
+    private void ShowEndScreen(BattleCondition battle_condition)
+    {
+        Time.timeScale = 0f;
+
+        // Display end battle controls
+        EndBattleText.gameObject.SetActive(true);
+        ConfirmButton.gameObject.SetActive(true);
+
+        if (battle_condition == BattleCondition.Win)
+        {
+            EndBattleText.text = "You won the battle!";
+        }
+        else
+        {
+            EndBattleText.text = "You lost the battle!";
+        }
+
+        // Hide the spawn button
+        SpawnButton.gameObject.SetActive(false);
+    }
+
+    #region Static
     // Game object list
     private static readonly Dictionary<int, BattleObject> _player_object_list = new();
     private static readonly Dictionary<int, BattleObject> _bot_object_list = new();
@@ -30,7 +90,7 @@ public static class BattleManager
     /// </summary>
     /// <param name="battle_object"></param>
     /// <returns></returns>
-    public static bool CheckIfMinionExists(BattleObject battle_object)
+    public static bool CheckIfObjectExists(BattleObject battle_object)
     {
         return (GetList(battle_object).ContainsKey(battle_object.GetInstanceID()));
     }
@@ -104,14 +164,18 @@ public static class BattleManager
         {
             float distance = Vector3.Distance(battle_object.transform.position, enemy_object.transform.position);
 
+            // Check if the enemy is in range
             if (distance <= range)
             {
+                // If no enemy is selected, use the current one
                 if (nearest_object == null)
                 {
                     nearest_object = enemy_object;
+                    nearest_distance = distance;
                 }
                 else
                 {
+                    // Compare the current enemy to the selected enemy and pick the closet one
                     if (distance < nearest_distance)
                     {
                         nearest_object = enemy_object;
@@ -123,4 +187,5 @@ public static class BattleManager
 
         return nearest_object;
     }
+    #endregion
 }
