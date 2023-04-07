@@ -2,11 +2,12 @@ using UnityEngine;
 
 public class GameObjectCreator : MonoBehaviour
 {
+    // Prefabs
     public GameObject Projectile = null;
     public GameObject Minion = null;
 
     #region Static
-    // Creator
+    // Properties
     private static GameObjectCreator _creator = null;
 
     /// <summary>

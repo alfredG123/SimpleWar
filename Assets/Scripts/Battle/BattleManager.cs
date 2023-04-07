@@ -3,116 +3,118 @@ using UnityEngine;
 
 public static class BattleManager
 {
-    // Minion list
-    private static Dictionary<string, Minion> _player_minion_list = new Dictionary<string, Minion>();
-    private static Dictionary<string, Minion> _bot_minion_list = new Dictionary<string, Minion>();
+    // Game object list
+    private static readonly Dictionary<int, BattleObject> _player_object_list = new();
+    private static readonly Dictionary<int, BattleObject> _bot_object_list = new();
 
     /// <summary>
-    /// Store the minion
+    /// Store the game object for later reference
     /// </summary>
-    /// <param name="minion"></param>
-    public static void RegisterMinion(Minion minion)
+    /// <param name="battle_object"></param>
+    public static void RegisterObject(BattleObject battle_object)
     {
-        GetList(minion).Add(minion.UniqueID, minion);
+        GetList(battle_object).Add(battle_object.GetInstanceID(), battle_object);
     }
 
     /// <summary>
-    /// Remove the minion
+    /// Remove the reference of the game object
     /// </summary>
-    /// <param name="minion_object"></param>
-    public static void DeregisterMinion(Minion minion)
+    /// <param name="battle_object"></param>
+    public static void DeregisterObject(BattleObject battle_object)
     {
-        GetList(minion).Remove(minion.UniqueID);
+        GetList(battle_object).Remove(battle_object.GetInstanceID());
     }
 
     /// <summary>
-    /// Check if the minion still exits
+    /// Check if the game object still exits
     /// </summary>
-    /// <param name="minion_object"></param>
+    /// <param name="battle_object"></param>
     /// <returns></returns>
-    public static bool CheckIfMinionExists(Minion minion)
+    public static bool CheckIfMinionExists(BattleObject battle_object)
     {
-        return (GetList(minion).ContainsKey(minion.UniqueID));
+        return (GetList(battle_object).ContainsKey(battle_object.GetInstanceID()));
     }
 
     /// <summary>
     /// Select the nearest game object that is an enemy
     /// </summary>
-    /// <param name="minion_object"></param>
+    /// <param name="battle_object"></param>
+    /// <param name="range"></param>
     /// <returns></returns>
-    public static GameObject GetNearestEnemy(Minion minion)
+    public static BattleObject GetNearestEnemy(BattleObject battle_object, float range)
     {
-        return GetNearestObject(minion);
+        return GetNearestObject(battle_object, range);
     }
 
     /// <summary>
-    /// Return the related list for the minion
+    /// Return the related list for the game object
     /// </summary>
-    /// <param name="minion"></param>
+    /// <param name="battle_object"></param>
     /// <returns></returns>
-    private static Dictionary<string, Minion> GetList(Minion minion)
+    private static Dictionary<int, BattleObject> GetList(BattleObject battle_object)
     {
-        Dictionary<string, Minion> minion_list;
+        Dictionary<int, BattleObject> object_list;
 
-        if (minion.Camp == Minion.MinionCamp.Player)
+        if (battle_object.Team == BattleObject.ObjectTeam.Player)
         {
-            minion_list = _player_minion_list;
+            object_list = _player_object_list;
         }
         else
         {
-            minion_list = _bot_minion_list;
+            object_list = _bot_object_list;
         }
 
-        return minion_list;
+        return object_list;
     }
 
     /// <summary>
     /// Return the enemy list for the minion
     /// </summary>
-    /// <param name="minion"></param>
+    /// <param name="battle_object"></param>
     /// <returns></returns>
-    private static Dictionary<string, Minion> GetEnemyList(Minion minion)
+    private static Dictionary<int, BattleObject> GetEnemyList(BattleObject battle_object)
     {
-        Dictionary<string, Minion> minion_list;
+        Dictionary<int, BattleObject> object_list;
 
-        if (minion.Camp == Minion.MinionCamp.Player)
+        if (battle_object.Team == BattleObject.ObjectTeam.Player)
         {
-            minion_list = _bot_minion_list;
+            object_list = _bot_object_list;
         }
         else
         {
-            minion_list = _player_minion_list;
+            object_list = _player_object_list;
         }
 
-        return minion_list;
+        return object_list;
     }
 
     /// <summary>
     /// Find the nearest enemy
     /// </summary>
-    /// <param name="minion"></param>
+    /// <param name="battle_object"></param>
+    /// <param name="range"></param>
     /// <returns></returns>
-    private static GameObject GetNearestObject(Minion minion)
+    private static BattleObject GetNearestObject(BattleObject battle_object, float range)
     {
-        GameObject nearest_object = null;
-        Dictionary<string, Minion> enemy_minion_list = GetEnemyList(minion);
+        BattleObject nearest_object = null;
+        Dictionary<int, BattleObject> enemy_object_list = GetEnemyList(battle_object);
         float nearest_distance = 0f;
 
-        foreach (Minion enemy_minion in enemy_minion_list.Values)
+        foreach (BattleObject enemy_object in enemy_object_list.Values)
         {
-            float distance = Vector3.Distance(minion.gameObject.transform.position, enemy_minion.transform.position);
+            float distance = Vector3.Distance(battle_object.transform.position, enemy_object.transform.position);
 
-            if (distance <= minion.AttackRange)
+            if (distance <= range)
             {
                 if (nearest_object == null)
                 {
-                    nearest_object = enemy_minion.gameObject;
+                    nearest_object = enemy_object;
                 }
                 else
                 {
                     if (distance < nearest_distance)
                     {
-                        nearest_object = enemy_minion.gameObject;
+                        nearest_object = enemy_object;
                         nearest_distance = distance;
                     }
                 }

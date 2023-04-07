@@ -3,13 +3,19 @@ using UnityEngine;
 public static class GeneralMethods
 {
     /// <summary>
-    /// Convert direction to angle
+    /// Convert the specified direction to an angle
     /// </summary>
     /// <param name="direction"></param>
     /// <returns></returns>
     public static float ConvertDirectionToAngle(Vector3 direction)
     {
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // Calculate the radians
+        float angle = Mathf.Atan2(direction.y, direction.x);
+        
+        // Convert the randians to angle
+        angle*= Mathf.Rad2Deg;
+
+        // Fix the angle
         if (angle < 0)
         {
             angle += 360;
