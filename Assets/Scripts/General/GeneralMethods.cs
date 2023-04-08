@@ -23,4 +23,16 @@ public static class GeneralMethods
 
         return angle;
     }
+
+    /// <summary>
+    /// Return the color for RGB (0-255)
+    /// </summary>
+    /// <param name="r"></param>
+    /// <param name="g"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    public static Color GetColor(float r, float g, float b)
+    {
+        return new Color(r / 255, g / 255, b / 255);
+    }
 }

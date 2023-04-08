@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7103458330504198504}
-  - component: {fileID: 5187506215789491343}
+  - component: {fileID: -5908879844225303996}
   m_Layer: 0
-  m_Name: GameObjectCreator
+  m_Name: MapData
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5187506215789491343
+--- !u!114 &-5908879844225303996
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,10 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7103458330504198505}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 519b39434801e1e468d93b605bf32f0c, type: 3}
+  m_Script: {fileID: 11500000, guid: ac6aa820806c6f542abc1a2d05617b8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Projectile: {fileID: 7581490725057978829, guid: 38f1d8e9803d7054496d9be4b4e91f9b, type: 3}
-  Minion: {fileID: 3922462256010688066, guid: 974299020ba2c024fa6e92130f7cc755, type: 3}
-  MapCell: {fileID: 1795257567565052352, guid: 871997e5d0d9c354a8190a5d206531b2, type: 3}
   Map1: {fileID: 4900000, guid: 38aaf5720c1cb4f4bbb8154ca4431e7b, type: 3}

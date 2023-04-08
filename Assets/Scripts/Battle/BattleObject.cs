@@ -5,6 +5,7 @@ public abstract class BattleObject : MonoBehaviour
     // Team of the object
     public enum ObjectTeam
     {
+        None,
         Player,
         Bot,
     }
