@@ -5,7 +5,6 @@ public class GameObjectCreator : MonoBehaviour
     // Prefabs
     public GameObject Projectile = null;
     public GameObject Minion = null;
-    public GameObject MapCell = null;
 
     #region Static
     // Properties

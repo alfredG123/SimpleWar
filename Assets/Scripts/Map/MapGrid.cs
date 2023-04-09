@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class MapGrid
@@ -19,14 +18,13 @@ public class MapGrid
     /// <param name="width"></param>
     /// <param name="height"></param>
     /// <param name="origin_position"></param>
-    public MapGrid(int width, int height, Vector3 origin_position)
+    /// <param name="cell_size"></param>
+    public MapGrid(int width, int height, Vector3 origin_position, Vector3 cell_size)
     {
-        Vector3 size = GameObjectCreator.Creator.MapCell.transform.Find("Sprite").GetComponent<SpriteRenderer>().bounds.size;
-
         _width = width;
         _height = height;
-        _cell_width = size.x;
-        _cell_height = size.y;
+        _cell_width = cell_size.x;
+        _cell_height = cell_size.y;
         _origin_position = origin_position;
 
         _grid = new GameObject[_width, _height];
@@ -76,40 +74,5 @@ public class MapGrid
         GetXY(position, out int x, out int y);
 
         return _grid[x, y];
-    }
-
-    /// <summary>
-    /// Create map cells
-    /// </summary>
-    /// <param name="map_data_text"></param>
-    public static void CreateMap(TextAsset map_data_text)
-    {
-        // Read the data
-        string[] row = map_data_text.text.Split(Environment.NewLine);
-        int height = row.Length;
-        int width = row[0].Split(",").Length;
-
-        // Create the map based on the data
-        MapGrid map = new(width, height, Vector3.zero);
-
-        // Read each character as cell and create one
-        for (int i = 0; i < width; i++)
-        {
-            for (int j = 0; j < height; j++)
-            {
-                int x = i;
-                int y = Math.Abs(height - j - 1);
-
-                // Create a map cell
-                GameObject map_cell = UnityEngine.Object.Instantiate(GameObjectCreator.Creator.MapCell, map.GetWorldPosition(x, y), Quaternion.identity);
-
-                // Convert char to CellType
-                string[] cell = row[j].Split(",");
-                MapCell.CellType cell_type = (MapCell.CellType)int.Parse(cell[i]);
-
-                // Set up the properties of the cell
-                map_cell.GetComponent<MapCell>().SetupCell(cell_type);
-            }
-        }
     }
 }
