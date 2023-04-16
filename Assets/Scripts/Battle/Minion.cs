@@ -37,14 +37,10 @@ public class Minion : BattleObject
         // Select an enemy to attack
         BattleObject enemy = BattleManager.GetNearestEnemy(this, _attack_range);
 
-        // If there are no targets, move forward
-        if (enemy == null)
-        {
-            Move();
-        }
+        Move();
 
         // If there is a target, attack it
-        else
+        if (enemy != null)
         {
             if (_attack_timer <= 0)
             {
@@ -52,9 +48,9 @@ public class Minion : BattleObject
 
                 _attack_timer = _attack_speed;
             }
-
-            _attack_timer -= Time.deltaTime;
         }
+
+        _attack_timer -= Time.deltaTime;
     }
 
     /// <summary>
@@ -75,7 +71,20 @@ public class Minion : BattleObject
         }
 
         // Move the minion toward to target direction
-        transform.Translate(direction.normalized * _speed * Time.deltaTime, Space.World);
+        if (CheckIfCanMove(direction))
+        {
+            transform.Translate(direction.normalized * _speed * Time.deltaTime, Space.World);
+        }
+    }
+
+    /// <summary>
+    /// Check if the character can move toward the specified direction
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns></returns>
+    private bool CheckIfCanMove(Vector3 direction)
+    {
+        return (!Physics.Raycast(transform.position, direction, 1f));
     }
 
     /// <summary>
